@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 
-def lqr_update_gains(u_in, h, N, x0, cost_gains, integrator, feedback_gains):
+def lqrUpdateGains(u_in, h, N, x0, cost_gains, integrator, feedback_gains):
     us = u_in.reshape(N, -1)
     w = np.zeros_like(x0)
     dynamic_param_list = []
