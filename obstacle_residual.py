@@ -12,8 +12,8 @@ def obstacleConstraint(Sigma_i, x_i, obstacle, T):
     Sigma_proj = projectEllipsoid(T, Sigma_i)
     rotated_x = np.dot(Sigma_proj.R.T, proj_diff)
     rotated_x_scaled = rotated_x/(Sigma_proj.S + obstacle.radius)
-    constraint_distance = np.sum(np.squared(rotated_x_scaled)) - 1.0
+    constraint_distance = np.sum(np.square(rotated_x_scaled)) - 1.0
     return constraint_distance
 
 def obstacleResidual(*args, **kwargs):
-    return np.min(obstacleConstraint(args, kwargs), 0.0)
+    return min(obstacleConstraint(*args, **kwargs), 0.0)
