@@ -3,7 +3,9 @@ import numpy as np
 from linearized_ellipsoid_propagation import propagateEllipsoid
 from obstacle_residual import obstacleResidual
 
-def residual(u_in, h, N, x0, Sigma0, Sigmaw, xds, uds, integrator, cost_gains, feedback_gains, obstacles, projection_matrix, xd_N=None):
+def residual(u_in, h, N, x0, Sigma0, Sigmaw, xds, uds, integrator, cost_gains, feedback_gains, obstacles, projection_matrix, xd_N=None, ko_sqrt=None):
+    if ko_sqrt is None:
+        ko_sqrt = 1
     us = u_in.reshape(N, -1)
     w = np.zeros_like(x0)
     x_current = x0
@@ -20,7 +22,7 @@ def residual(u_in, h, N, x0, Sigma0, Sigmaw, xds, uds, integrator, cost_gains, f
             residual_list.append(np.dot(Rsqrt, u_diff))
 
         for  obstacle in obstacles:
-            residual_list.append(obstacleResidual(Sigma_current, x_current, obstacle, projection_matrix))
+            residual_list.append(ko_sqrt*obstacleResidual(Sigma_current, x_current, obstacle, projection_matrix))
         x_current = integrator.step(i, h, x_current, u, w)
         dynamics_params = integrator.jacobian(i, h, x_current, u, w)
         Sigma_current = propagateEllipsoid(Sigma_current, Sigmaw, dynamics_params, feedback_gains[i])
@@ -36,5 +38,5 @@ def residual(u_in, h, N, x0, Sigma0, Sigmaw, xds, uds, integrator, cost_gains, f
         x_diff = x_current - x_terminal
         residual_list.append(np.dot(Qfsqrt,x_diff))
     for  obstacle in obstacles:
-        residual_list.append(obstacleResidual(Sigma_current, x_current, obstacle, projection_matrix))
+        residual_list.append(ko_sqrt*obstacleResidual(Sigma_current, x_current, obstacle, projection_matrix))
     return np.hstack(residual_list)
