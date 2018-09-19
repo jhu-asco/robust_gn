@@ -23,8 +23,9 @@ def gn_lqr_algo(N, h, x0, u0, Sigma0, Sigmaw, integrator, cost_gains,
     # Save args
     args = (h, N, x0, Sigma0, Sigmaw, xds, uds, integrator, cost_sqrt_gains,
             feedback_gains, obstacles, projection_matrix, xd_N, ko_sqrt)
+    lqrUpdateFun = lambda u: lqrUpdateGains(u, h, N, x0, cost_gains, integrator, feedback_gains)
     # Perform GN now
-    out = least_squares(residual, u0, args=args, verbose=2)
+    out = least_squares(residual, u0, args=args, verbose=2, tr_options={'iterCb':lqrUpdateFun})
     u_opt = out.x
     xs_opt, us_opt = getNominalDynamics(u_opt, h, N, x0, integrator)
     lqrUpdateGains(u_opt, h, N, x0, cost_gains, integrator, feedback_gains)
