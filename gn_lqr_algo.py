@@ -28,7 +28,7 @@ def gn_lqr_algo(N, h, x0, u0, Sigma0, Sigmaw, integrator, cost_gains,
     out = least_squares(residual, u0, args=args, verbose=2, tr_options={'iterCb':lqrUpdateFun})
     u_opt = out.x
     xs_opt, us_opt = getNominalDynamics(u_opt, h, N, x0, integrator)
-    lqrUpdateGains(u_opt, h, N, x0, cost_gains, integrator, feedback_gains)
+    print "Updated Feedback gains: ", feedback_gains
     Sigma_out = getNominalEllipsoids(h, xs_opt, us_opt, Sigma0, Sigmaw,
                                      projection_matrix, feedback_gains,
                                      integrator)

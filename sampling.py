@@ -14,12 +14,14 @@ def getNominalDynamics(u, h, N, x0, integrator):
 
 def getNominalEllipsoids(h, xs, us, Sigma0, Sigmaw, projection_matrix, feedback_gains, integrator):
     Sigma_out = [projectEllipsoid(projection_matrix, Sigma0)]
+    Sigma_out[0].center = np.dot(projection_matrix, xs[0])
     Sigma_current = Sigma0
     w = np.zeros_like(xs[0])
     for i, u in enumerate(us):
         dynamics_params = integrator.jacobian(i, h, xs[i], u, w)
         Sigma_current = propagateEllipsoid(Sigma_current, Sigmaw, dynamics_params, feedback_gains[i])
         Sigma_out.append(projectEllipsoid(projection_matrix, Sigma_current))
+        Sigma_out[-1].center = np.dot(projection_matrix, xs[i+1])
     return Sigma_out
 
 def sampleTrajectory(x0, xds, uds, h, integrator, feedback_gains):
